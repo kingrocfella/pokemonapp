@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.mypokemonapplication.common.api.ApiService
 import com.example.mypokemonapplication.common.api.makeAPICall
 
 data class PokemonListState(
@@ -15,7 +16,9 @@ data class PokemonListState(
     var pokemonList: PokemonList? = null
 )
 
-class PokemonListViewModel : ViewModel() {
+class PokemonListViewModel(
+    private val apiService: ApiService = makeAPICall
+) : ViewModel() {
     private var _pokemonList by mutableStateOf(PokemonListState())
     val getPokemonListState: PokemonListState
         get() = _pokemonList
@@ -27,12 +30,12 @@ class PokemonListViewModel : ViewModel() {
     private fun getPokemonList(limit: Int = 20, offset: Int = 0) {
         try {
             viewModelScope.launch {
-                val response = makeAPICall.getPokemonData(limit, offset)
+                val response = apiService.getPokemonData(limit, offset)
                 _pokemonList =
                     _pokemonList.copy(isLoading = false, isError = false, pokemonList = response)
             }
-        } catch (ex: Exception) {
-            _pokemonList.copy(isLoading = false, isError = true)
+        } catch (_: Exception) {
+            _pokemonList = _pokemonList.copy(isLoading = false, isError = true)
         }
     }
 
@@ -42,7 +45,7 @@ class PokemonListViewModel : ViewModel() {
             else -> _pokemonList.pokemonList?.previous
         }
         if(url?.isEmpty() == true) return
-        _pokemonList.copy(isLoading = true)
+        _pokemonList = _pokemonList.copy(isLoading = true)
         val uri = url?.toUri()
         val offset = uri?.getQueryParameter("offset")?.toIntOrNull() ?: 0
         val limit = uri?.getQueryParameter("limit")?.toIntOrNull() ?: 20

@@ -58,7 +58,7 @@ fun StartUpApp() {
             if (detailUrl != null) {
                 PokemonDetailsScreen(detailUrl)
             } else {
-                // Only show toast if we're actually on the details screen and not navigating back
+                // Only show toast if we're actually on the pokemon details screen and not navigating back
                 if (navController.currentBackStackEntry?.destination?.route == ScreenNames.DETAILS.route) {
                     Toast.makeText(context, "No Pokemon details found", Toast.LENGTH_SHORT).show()
                 }
