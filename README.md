@@ -25,6 +25,9 @@ The app follows modern Android development best practices:
 
 ## 📱 Screenshots
 
+<details>
+<summary>Click to view app screenshots</summary>
+
 ![Pokemon List Screen](static/PokemonListScreen.png)
 *Pokemon List Screen - Browse through Pokemon with names and IDs*
 
@@ -35,6 +38,8 @@ The app consists of two main screens:
 
 1. **Pokemon List Screen**: Displays a grid of Pokemon cards with names and IDs
 2. **Pokemon Details Screen**: Shows comprehensive Pokemon information in a beautiful card layout
+
+</details>
 
 ## 🛠️ Tech Stack
 
