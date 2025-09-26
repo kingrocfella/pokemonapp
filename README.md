@@ -118,37 +118,59 @@ Both Unit and UI tests can be run on Android Studio.
 ## 📁 Project Structure
 
 ```
-app/
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/mypokemonapplication/
-│   │   │   ├── MainActivity.kt                 # Main activity and navigation
-│   │   │   ├── common/
-│   │   │   │   ├── api/                        # API service and routes
-│   │   │   │   ├── screens/                    # Screen navigation definitions
-│   │   │   │   ├── ui/                         # Common UI components
-│   │   │   │   └── utils/                      # Utility functions
-│   │   │   ├── pokemonlist/                    # Pokemon list feature
-│   │   │   │   ├── PokemonListScreen.kt        # List screen composable
-│   │   │   │   ├── PokemonListViewModel.kt     # List view model
-│   │   │   │   ├── PokemonItem.kt              # Pokemon item composable
-│   │   │   │   └── PokemonList.kt              # Data models
-│   │   │   ├── pokemondetails/                 # Pokemon details feature
-│   │   │   │   ├── PokemonDetailsScreen.kt     # Details screen composable
-│   │   │   │   ├── PokemonDetailsViewModel.kt  # Details view model
-│   │   │   │   ├── PokemonDetailsViewModelFactory.kt # ViewModel factory
-│   │   │   │   └── PokemonDetails.kt           # Data models
-│   │   │   └── ui/theme/                       # App theming
-│   │   └── res/                                # Resources (layouts, strings, etc.)
-│   ├── test/                                   # Unit tests
-│   │   └── java/com/example/mypokemonapplication/
-│   │       ├── PokemonListViewModelTest.kt     # List ViewModel tests
-│   │       ├── PokemonDetailsViewModelTest.kt  # Details ViewModel tests
-│   │       └── PokemonItemComposableTest.kt    # Item composable tests
-│   └── androidTest/                            # UI tests
-│       └── java/com/example/mypokemonapplication/
-│           └── PokemonAppEspressoTest.kt       # Espresso UI tests
-|__ build.gradle.kts                            # App-level build configuration
+Mypokemonapplication/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/example/mypokemonapplication/
+│   │   │   │   ├── MainActivity.kt                 # Main activity and navigation
+│   │   │   │   ├── common/
+│   │   │   │   │   ├── api/
+│   │   │   │   │   │   ├── ApiService.kt          # API service interface
+│   │   │   │   │   │   └── ApiRoutes.kt           # API routes and endpoints
+│   │   │   │   │   ├── screens/
+│   │   │   │   │   │   └── ScreenNames.kt         # Screen navigation definitions
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   └── UISkeleton.kt          # Common UI components
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── Utils.kt               # Utility functions
+│   │   │   │   ├── pokemonlist/
+│   │   │   │   │   ├── PokemonListScreen.kt       # List screen composable
+│   │   │   │   │   ├── PokemonListViewModel.kt    # List view model
+│   │   │   │   │   ├── PokemonItem.kt             # Pokemon item composable
+│   │   │   │   │   ├── PokemonList.kt             # Data models
+│   │   │   │   │   └── DisplayPokemonList.kt      # List display composable
+│   │   │   │   ├── pokemondetails/
+│   │   │   │   │   ├── PokemonDetailsScreen.kt    # Details screen composable
+│   │   │   │   │   ├── PokemonDetailsViewModel.kt # Details view model
+│   │   │   │   │   ├── PokemonDetailsViewModelFactory.kt # ViewModel factory
+│   │   │   │   │   ├── PokemonDetails.kt          # Data models
+│   │   │   │   │   ├── DisplayPokemonDetails.kt   # Details display composable
+│   │   │   │   │   └── PokemonDetailRow.kt        # Detail row composable
+│   │   │   │   └── ui/theme/
+│   │   │   │       ├── Color.kt                   # Color definitions
+│   │   │   │       ├── Theme.kt                   # Theme configuration
+│   │   │   │       └── Type.kt                    # Typography definitions
+│   │   │   ├── res/                               # Resources (layouts, strings, etc.)
+│   │   │   └── AndroidManifest.xml                # App manifest
+│   │   ├── test/                                  # Unit tests
+│   │   │   └── java/com/example/mypokemonapplication/
+│   │   │       ├── PokemonListViewModelTest.kt    # List ViewModel tests
+│   │   │       └── PokemonDetailsViewModelTest.kt # Details ViewModel tests
+│   │   └── androidTest/                           # UI tests
+│   │       └── java/com/example/mypokemonapplication/
+│   │           └── PokemonAppEspressoTest.kt      # Espresso UI tests
+│   ├── build.gradle.kts                           # App-level build configuration
+│   └── proguard-rules.pro                         # ProGuard rules
+├── static/                                        # Documentation assets
+│   ├── PokemonListScreen.png                      # List screen screenshot
+│   └── PokemonDetailsScreen.png                   # Details screen screenshot
+├── build.gradle.kts                               # Project-level build configuration
+├── settings.gradle.kts                            # Project settings
+├── gradle.properties                              # Gradle properties
+├── gradlew                                        # Gradle wrapper script (Unix)
+├── gradlew.bat                                    # Gradle wrapper script (Windows)
+└── README.md                                      # Project documentation
 ```
 
 ## 🔧 Configuration
