@@ -7,7 +7,7 @@ A modern Android application built with Jetpack Compose that displays Pokemon da
 - **Pokemon List View**: Browse through a paginated list of Pokemon with names and IDs
 - **Pokemon Details**: View detailed information about individual Pokemon including:
   - Pokemon name and ID
-  - Height and weight
+  - Height
   - Pokemon images
 - **Navigation**: Smooth navigation between list and details screens
 - **Modern UI**: Built with Material Design 3 and Jetpack Compose
