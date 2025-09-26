@@ -1,0 +1,18 @@
+package com.example.mypokemonapplication.common.utils
+
+
+class Utils {
+    fun getPokemonIdFromUrl(url: String): Int? {
+        val pokemonId = url.split("/").dropLast(1).lastOrNull()?.toIntOrNull()
+        return pokemonId
+    }
+
+    fun capitalizeFirstLetter(word: String?): String {
+        val newWord = word?.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase() else it.toString()
+        } ?: "-"
+        return newWord
+    }
+}
+
+
