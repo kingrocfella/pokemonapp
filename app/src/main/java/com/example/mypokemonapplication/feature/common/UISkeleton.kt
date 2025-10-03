@@ -1,4 +1,4 @@
-package com.example.mypokemonapplication.common.ui
+package com.example.mypokemonapplication.feature.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,12 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.mypokemonapplication.data.models.UISkeletonData
 
-data class UISkeletonData(
-    val isLoading: Boolean = false,
-    val isError: Boolean = false,
-    val isDataEmpty: Boolean = false
-)
 
 @Composable
 fun UISkeleton(data: UISkeletonData, displayFunction: @Composable () -> Unit) {

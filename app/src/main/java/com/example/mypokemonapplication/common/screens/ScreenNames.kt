@@ -1,6 +1,7 @@
 package com.example.mypokemonapplication.common.screens
 
-enum class ScreenNames(val route: String) {
-    HOME("HOME"),
-    DETAILS("DETAILS")
+object ScreenNames {
+
+    const val HOME = "HOME"
+    const val DETAILS = "DETAILS"
 }

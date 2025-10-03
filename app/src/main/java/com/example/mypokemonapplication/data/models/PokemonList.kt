@@ -1,4 +1,4 @@
-package com.example.mypokemonapplication.pokemonlist
+package com.example.mypokemonapplication.data.models
 
 data class PokemonListResult(val name: String, val url: String)
 

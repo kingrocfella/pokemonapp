@@ -1,4 +1,4 @@
-package com.example.mypokemonapplication.pokemondetails
+package com.example.mypokemonapplication.feature.pokemondetails
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

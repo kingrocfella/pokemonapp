@@ -14,7 +14,7 @@ class UtilsTest {
 
     @Before
     fun setUp() {
-        utils = Utils()
+        utils = Utils
     }
 
     @Test

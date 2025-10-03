@@ -1,4 +1,4 @@
-package com.example.mypokemonapplication.pokemonlist
+package com.example.mypokemonapplication.feature.pokemonlist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mypokemonapplication.common.utils.Utils
+import com.example.mypokemonapplication.data.models.PokemonListResult
 
 @Composable
 fun PokemonItem(item: PokemonListResult, onDetailsClick: (url: String) -> Unit) {
@@ -47,7 +48,7 @@ fun PokemonItem(item: PokemonListResult, onDetailsClick: (url: String) -> Unit) 
 
             // Pokemon Name
             Text(
-                text = Utils().capitalizeFirstLetter(item.name),
+                text = Utils.capitalizeFirstLetter(item.name),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -60,7 +61,7 @@ fun PokemonItem(item: PokemonListResult, onDetailsClick: (url: String) -> Unit) 
             Spacer(modifier = Modifier.height(8.dp))
 
             // Pokemon ID (extracted from URL)
-            val pokemonId = Utils().getPokemonIdFromUrl(item.url)
+            val pokemonId = Utils.getPokemonIdFromUrl(item.url)
             if (pokemonId != null) {
                 Text(
                     text = "#${pokemonId}",

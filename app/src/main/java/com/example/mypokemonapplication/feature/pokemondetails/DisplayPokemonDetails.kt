@@ -1,10 +1,10 @@
-package com.example.mypokemonapplication.pokemondetails
+package com.example.mypokemonapplication.feature.pokemondetails
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,11 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.mypokemonapplication.common.utils.Utils
+import com.example.mypokemonapplication.data.models.PokemonDetails
 
 @Composable
 fun DisplayPokemonDetails(pokemonDetails: PokemonDetails?) {
@@ -51,7 +55,7 @@ fun DisplayPokemonDetails(pokemonDetails: PokemonDetails?) {
 
                 // Pokemon Header
                 Text(
-                    text = Utils().capitalizeFirstLetter(pokemonDetails?.name),
+                    text = Utils.capitalizeFirstLetter(pokemonDetails?.name),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -83,12 +87,16 @@ fun DisplayPokemonDetails(pokemonDetails: PokemonDetails?) {
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(pokemonDetails?.sprites?.front_default),
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(pokemonDetails?.sprites?.front_default)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = "Pokemon image for ${pokemonDetails?.name}",
                         modifier = Modifier
-                            .size(220.dp)
-                            .clip(RoundedCornerShape(16.dp))
+                            .size(200.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        contentScale = ContentScale.Fit
                     )
                 }
 
@@ -110,7 +118,7 @@ fun DisplayPokemonDetails(pokemonDetails: PokemonDetails?) {
                     // Name
                     PokemonDetailRow(
                         label = "Name",
-                        value = Utils().capitalizeFirstLetter(pokemonDetails?.name)
+                        value = Utils.capitalizeFirstLetter(pokemonDetails?.name)
                     )
 
                     // Height

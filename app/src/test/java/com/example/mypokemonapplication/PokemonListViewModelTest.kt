@@ -1,9 +1,12 @@
 package com.example.mypokemonapplication
 
-import com.example.mypokemonapplication.pokemonlist.PokemonList
-import com.example.mypokemonapplication.pokemonlist.PokemonListResult
-import com.example.mypokemonapplication.pokemonlist.PokemonListViewModel
-import com.example.mypokemonapplication.common.api.ApiService
+import com.example.mypokemonapplication.data.models.PokemonList
+import com.example.mypokemonapplication.data.models.PokemonListResult
+import com.example.mypokemonapplication.data.models.ViewModelState
+import com.example.mypokemonapplication.feature.pokemonlist.PokemonListViewModel
+import com.example.mypokemonapplication.data.api.ApiService
+import com.example.mypokemonapplication.data.repository.PokemonUrlRepository
+import com.example.mypokemonapplication.services.NavigationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -27,6 +30,11 @@ class PokemonListViewModelTest {
     @Mock
     private lateinit var mockApiService: ApiService
 
+    private lateinit var pokemonUrlRepository: PokemonUrlRepository
+
+    private lateinit var navigationService: NavigationService
+
+
     private lateinit var viewModel: PokemonListViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -34,6 +42,8 @@ class PokemonListViewModelTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         Dispatchers.setMain(testDispatcher)
+        pokemonUrlRepository = PokemonUrlRepository()
+        navigationService = NavigationService()
     }
 
     @After
@@ -49,12 +59,16 @@ class PokemonListViewModelTest {
             )
         }
 
-        viewModel = PokemonListViewModel(mockApiService)
-        val initialState = viewModel.getPokemonListState
+        viewModel = PokemonListViewModel(
+            mockApiService, pokemonUrlRepository,
+            navigationService = navigationService
+        )
+
+        val initialState = viewModel.getPokemonListState.value
 
         assertTrue("Should start in loading state", initialState.isLoading)
         assertFalse("Should not be in error state initially", initialState.isError)
-        assertNull("Pokemon list should be null initially", initialState.pokemonList)
+        assertNull("Pokemon list should be null initially", initialState.data)
     }
 
     @Test
@@ -75,16 +89,17 @@ class PokemonListViewModelTest {
         }
 
         // Create ViewModel with mocked API service
-        viewModel = PokemonListViewModel(mockApiService)
+        viewModel =
+            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 
-        val state = viewModel.getPokemonListState
+        val state = viewModel.getPokemonListState.value
         assertFalse("Should not be loading after success", state.isLoading)
         assertFalse("Should not be in error state", state.isError)
-        assertNotNull("Pokemon list should not be null", state.pokemonList)
-        assertEquals("Should have correct count", 2, state.pokemonList?.count)
-        assertEquals("Should have 2 results", 2, state.pokemonList?.results?.size)
+        assertNotNull("Pokemon list should not be null", state.data)
+        assertEquals("Should have correct count", 2, state.data?.count)
+        assertEquals("Should have 2 results", 2, state.data?.results?.size)
     }
 
     @Test
@@ -102,16 +117,17 @@ class PokemonListViewModelTest {
         }
 
         // Create ViewModel with mocked API service
-        viewModel = PokemonListViewModel(mockApiService)
+        viewModel =
+            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 
-        val state = viewModel.getPokemonListState
+        val state = viewModel.getPokemonListState.value
         assertFalse("Should not be loading", state.isLoading)
         assertFalse("Should not be in error state", state.isError)
-        assertNotNull("Pokemon list should not be null", state.pokemonList)
-        assertEquals("Should have 0 count", 0, state.pokemonList?.count)
-        assertTrue("Results should be empty", state.pokemonList?.results?.isEmpty() == true)
+        assertNotNull("Pokemon list should not be null", state.data)
+        assertEquals("Should have 0 count", 0, state.data?.count)
+        assertTrue("Results should be empty", state.data?.results?.isEmpty() == true)
     }
 
     @Test
@@ -132,13 +148,17 @@ class PokemonListViewModelTest {
         }
 
         // Create ViewModel with mocked API service
-        viewModel = PokemonListViewModel(mockApiService)
+        viewModel =
+            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 
-        val state = viewModel.getPokemonListState
-        assertNotNull("Next URL should be available", state.pokemonList?.next)
-        assertTrue("Should have next page", state.pokemonList?.next?.isNotEmpty() == true)
+        val state = viewModel.getPokemonListState.value
+        assertFalse("Should not be loading", state.isLoading)
+        assertFalse("Should not be in error state", state.isError)
+        assertNotNull("Pokemon list should not be null", state.data)
+        assertNotNull("Next URL should be available", state.data?.next)
+        assertTrue("Should have next page", state.data?.next?.isNotEmpty() == true)
     }
 
     @Test
@@ -159,13 +179,17 @@ class PokemonListViewModelTest {
         }
 
         // Create ViewModel with mocked API service
-        viewModel = PokemonListViewModel(mockApiService)
+        viewModel =
+            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 
-        val state = viewModel.getPokemonListState
-        assertNotNull("Previous URL should be available", state.pokemonList?.previous)
-        assertTrue("Should have previous page", state.pokemonList?.previous?.isNotEmpty() == true)
+        val state = viewModel.getPokemonListState.value
+        assertFalse("Should not be loading", state.isLoading)
+        assertFalse("Should not be in error state", state.isError)
+        assertNotNull("Pokemon list should not be null", state.data)
+        assertNotNull("Previous URL should be available", state.data?.previous)
+        assertTrue("Should have previous page", state.data?.previous?.isNotEmpty() == true)
     }
 
 }

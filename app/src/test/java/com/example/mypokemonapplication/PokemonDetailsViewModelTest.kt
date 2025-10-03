@@ -1,9 +1,10 @@
 package com.example.mypokemonapplication
 
-import com.example.mypokemonapplication.pokemondetails.PokemonDetails
-import com.example.mypokemonapplication.pokemondetails.PokemonDetailsViewModel
-import com.example.mypokemonapplication.pokemondetails.PokemonSpriteDetails
-import com.example.mypokemonapplication.common.api.ApiService
+import com.example.mypokemonapplication.data.models.PokemonDetails
+import com.example.mypokemonapplication.data.models.PokemonSpriteDetails
+import com.example.mypokemonapplication.feature.pokemondetails.PokemonDetailsViewModel
+import com.example.mypokemonapplication.data.api.ApiService
+import com.example.mypokemonapplication.data.repository.PokemonUrlRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -27,6 +28,8 @@ class PokemonDetailsViewModelTest {
     @Mock
     private lateinit var mockApiService: ApiService
 
+    private lateinit var pokemonUrlRepository: PokemonUrlRepository
+
     private lateinit var viewModel: PokemonDetailsViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -34,6 +37,7 @@ class PokemonDetailsViewModelTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         Dispatchers.setMain(testDispatcher)
+        pokemonUrlRepository = PokemonUrlRepository()
     }
 
     @After
@@ -44,19 +48,18 @@ class PokemonDetailsViewModelTest {
     @Test
     fun `ViewModel should initialize with loading state`() {
 
-        val testUrl = "https://pokeapi.co/api/v2/pokemon/25/"
         runBlocking {
             whenever(mockApiService.getPokemonDetailsData(25)).thenReturn(
                 createMockPokemonDetails()
             )
         }
 
-        viewModel = PokemonDetailsViewModel(testUrl, mockApiService)
-        val initialState = viewModel.getPokemonDetailsState
+        viewModel = PokemonDetailsViewModel(mockApiService, pokemonUrlRepository)
+        val initialState = viewModel.getPokemonDetailsState.value
 
         assertTrue("Should start in loading state", initialState.isLoading)
         assertFalse("Should not be in error state initially", initialState.isError)
-        assertNull("Pokemon details should be null initially", initialState.pokemonDetailsData)
+        assertNull("Pokemon details should be null initially", initialState.data)
     }
 
     @Test
@@ -69,15 +72,16 @@ class PokemonDetailsViewModelTest {
             whenever(mockApiService.getPokemonDetailsData(25)).thenReturn(mockPokemonDetails)
         }
 
-        viewModel = PokemonDetailsViewModel(testUrl, mockApiService)
+        viewModel = PokemonDetailsViewModel(mockApiService, pokemonUrlRepository)
+        pokemonUrlRepository.setSelectedPokemonUrl(testUrl)
         advanceUntilIdle()
 
-        val state = viewModel.getPokemonDetailsState
+        val state = viewModel.getPokemonDetailsState.value
         assertFalse("Should not be loading after success", state.isLoading)
         assertFalse("Should not be in error state", state.isError)
-        assertNotNull("Pokemon details should not be null", state.pokemonDetailsData)
-        assertEquals("Should have correct Pokemon ID", 25, state.pokemonDetailsData?.id)
-        assertEquals("Should have correct Pokemon name", "pikachu", state.pokemonDetailsData?.name)
+        assertNotNull("Pokemon details should not be null", state.data)
+        assertEquals("Should have correct Pokemon ID", 25, state.data?.id)
+        assertEquals("Should have correct Pokemon name", "pikachu", state.data?.name)
     }
 
     @Test
@@ -85,13 +89,16 @@ class PokemonDetailsViewModelTest {
 
         val invalidUrl = "https://pokeapi.co/api/v2/pokemon/invalid/"
 
-        viewModel = PokemonDetailsViewModel(invalidUrl, mockApiService)
+        val mockRepository = PokemonUrlRepository()
+        viewModel = PokemonDetailsViewModel(mockApiService, mockRepository)
+        mockRepository.setSelectedPokemonUrl(invalidUrl)
         advanceUntilIdle()
 
-        val state = viewModel.getPokemonDetailsState
-        assertFalse("Should not be loading after invalid URL", state.isLoading)
+        val state = viewModel.getPokemonDetailsState.value
+        assertFalse("Should not be loading after error", state.isLoading)
         assertTrue("Should be in error state", state.isError)
-        assertNull("Pokemon details should be null", state.pokemonDetailsData)
+        assertNull("Pokemon details should be null", state.data)
+        assertNotNull("Error message should not be null", state.errorMessage)
     }
 
     @Test
@@ -99,13 +106,16 @@ class PokemonDetailsViewModelTest {
 
         val emptyUrl = ""
 
-        viewModel = PokemonDetailsViewModel(emptyUrl, mockApiService)
+        val mockRepository = PokemonUrlRepository()
+        viewModel = PokemonDetailsViewModel(mockApiService, mockRepository)
+        mockRepository.setSelectedPokemonUrl(emptyUrl)
         advanceUntilIdle()
 
-        val state = viewModel.getPokemonDetailsState
-        assertFalse("Should not be loading after empty URL", state.isLoading)
+        val state = viewModel.getPokemonDetailsState.value
+        assertFalse("Should not be loading after error", state.isLoading)
         assertTrue("Should be in error state", state.isError)
-        assertNull("Pokemon details should be null", state.pokemonDetailsData)
+        assertNull("Pokemon details should be null", state.data)
+        assertNotNull("Error message should not be null", state.errorMessage)
     }
 
     // Helper function to create mock PokemonDetails data class
