@@ -8,12 +8,13 @@ A modern Android application built with Jetpack Compose that displays Pokemon da
 - **Pokemon Details**: View detailed information about individual Pokemon including:
   - Pokemon name and ID
   - Height
-  - Pokemon images
+  - High-quality Pokemon images
 - **Navigation**: Smooth navigation between list and details screens
 - **Modern UI**: Built with Material Design 3 and Jetpack Compose
 - **Image Loading**: Efficient image loading with Coil
 - **Error Handling**: Graceful error handling with user-friendly messages
 - **Loading States**: Proper loading indicators during data fetching
+- **Dependency Injection**: Clean architecture with Hilt DI
 
 ## 🏗️ Architecture
 
@@ -22,6 +23,10 @@ The app follows modern Android development best practices:
 - **MVVM Architecture**: Model-View-ViewModel pattern for clean separation of concerns
 - **Jetpack Compose**: Modern declarative UI framework
 - **Navigation Compose**: Type-safe navigation between screens
+- **Hilt Dependency Injection**: Clean dependency management
+- **Repository Pattern**: Data layer abstraction
+- **State Management**: Reactive state handling with StateFlow
+- **Clean Architecture**: Clear separation between data, feature, and common layers
 
 ## 📱 Screenshots
 
@@ -52,11 +57,16 @@ The app consists of two main screens:
 ### Libraries & Dependencies
 
 #### UI & Navigation
-- **Jetpack Compose BOM**: `2024.09.00`
+- **Jetpack Compose BOM**: `2024.12.01`
 - **Material 3**: Modern Material Design components
 - **Navigation Compose**: `2.9.5` - Type-safe navigation
 - **Activity Compose**: `1.11.0` - Compose integration
 - **Lifecycle ViewModel Compose**: `2.9.4` - ViewModel integration
+
+#### Dependency Injection
+- **Hilt Android**: `2.48` - Dependency injection framework
+- **Hilt Navigation Compose**: `1.2.0` - Navigation integration
+- **KSP**: `1.9.22-1.0.17` - Kotlin Symbol Processing
 
 #### Networking & Data
 - **Retrofit**: `2.9.0` - HTTP client for API calls
@@ -66,6 +76,7 @@ The app consists of two main screens:
 #### Core Android
 - **AndroidX Core**: `1.17.0` - Core Android functionality
 - **Lifecycle Runtime KTX**: `2.9.4` - Lifecycle-aware components
+- **Kotlin Coroutines Core**: `1.5.0` - Coroutine support
 
 #### Testing
 - **JUnit**: `4.13.2` - Unit testing framework
@@ -117,6 +128,8 @@ Both Unit and UI tests can be run on Android Studio.
 
 ## 📁 Project Structure
 
+The project follows a clean architecture with clear separation of concerns:
+
 ```
 Mypokemonapplication/
 ├── app/
@@ -124,29 +137,38 @@ Mypokemonapplication/
 │   │   ├── main/
 │   │   │   ├── java/com/example/mypokemonapplication/
 │   │   │   │   ├── MainActivity.kt                 # Main activity and navigation
-│   │   │   │   ├── common/
+│   │   │   │   ├── PokemonApplication.kt           # Application class with Hilt
+│   │   │   │   ├── data/                           # Data layer
 │   │   │   │   │   ├── api/
 │   │   │   │   │   │   ├── ApiService.kt          # API service interface
 │   │   │   │   │   │   └── ApiRoutes.kt           # API routes and endpoints
+│   │   │   │   │   ├── models/
+│   │   │   │   │   │   ├── PokemonList.kt         # Pokemon list data models
+│   │   │   │   │   │   ├── PokemonDetails.kt      # Pokemon details data models
+│   │   │   │   │   │   └── ViewModelState.kt      # Unified state management
+│   │   │   │   │   ├── repository/
+│   │   │   │   │   │   └── PokemonUrlRepository.kt # Repository for URL management
+│   │   │   │   │   └── NetworkModule.kt           # Hilt network module
+│   │   │   │   ├── feature/                        # Feature layer
+│   │   │   │   │   ├── pokemonlist/
+│   │   │   │   │   │   ├── PokemonListScreen.kt   # List screen composable
+│   │   │   │   │   │   ├── PokemonListViewModel.kt # List view model
+│   │   │   │   │   │   ├── PokemonItem.kt         # Pokemon item composable
+│   │   │   │   │   │   └── DisplayPokemonList.kt  # List display composable
+│   │   │   │   │   ├── pokemondetails/
+│   │   │   │   │   │   ├── PokemonDetailsScreen.kt # Details screen composable
+│   │   │   │   │   │   ├── PokemonDetailsViewModel.kt # Details view model
+│   │   │   │   │   │   ├── DisplayPokemonDetails.kt # Details display composable
+│   │   │   │   │   │   └── PokemonDetailRow.kt    # Detail row composable
+│   │   │   │   │   └── common/
+│   │   │   │   │       └── UISkeleton.kt          # Common UI components
+│   │   │   │   ├── common/                         # Common layer
 │   │   │   │   │   ├── screens/
 │   │   │   │   │   │   └── ScreenNames.kt         # Screen navigation definitions
-│   │   │   │   │   ├── ui/
-│   │   │   │   │   │   └── UISkeleton.kt          # Common UI components
 │   │   │   │   │   └── utils/
 │   │   │   │   │       └── Utils.kt               # Utility functions
-│   │   │   │   ├── pokemonlist/
-│   │   │   │   │   ├── PokemonListScreen.kt       # List screen composable
-│   │   │   │   │   ├── PokemonListViewModel.kt    # List view model
-│   │   │   │   │   ├── PokemonItem.kt             # Pokemon item composable
-│   │   │   │   │   ├── PokemonList.kt             # Data models
-│   │   │   │   │   └── DisplayPokemonList.kt      # List display composable
-│   │   │   │   ├── pokemondetails/
-│   │   │   │   │   ├── PokemonDetailsScreen.kt    # Details screen composable
-│   │   │   │   │   ├── PokemonDetailsViewModel.kt # Details view model
-│   │   │   │   │   ├── PokemonDetailsViewModelFactory.kt # ViewModel factory
-│   │   │   │   │   ├── PokemonDetails.kt          # Data models
-│   │   │   │   │   ├── DisplayPokemonDetails.kt   # Details display composable
-│   │   │   │   │   └── PokemonDetailRow.kt        # Detail row composable
+│   │   │   │   ├── services/
+│   │   │   │   │   └── NavigationService.kt       # Navigation service
 │   │   │   │   └── ui/theme/
 │   │   │   │       ├── Color.kt                   # Color definitions
 │   │   │   │       ├── Theme.kt                   # Theme configuration
@@ -156,7 +178,8 @@ Mypokemonapplication/
 │   │   ├── test/                                  # Unit tests
 │   │   │   └── java/com/example/mypokemonapplication/
 │   │   │       ├── PokemonListViewModelTest.kt    # List ViewModel tests
-│   │   │       └── PokemonDetailsViewModelTest.kt # Details ViewModel tests
+│   │   │       ├── PokemonDetailsViewModelTest.kt # Details ViewModel tests
+│   │   │       └── UtilsTest.kt                   # Utility function tests
 │   │   └── androidTest/                           # UI tests
 │   │       └── java/com/example/mypokemonapplication/
 │   │           └── PokemonAppEspressoTest.kt      # Espresso UI tests
@@ -168,6 +191,8 @@ Mypokemonapplication/
 ├── build.gradle.kts                               # Project-level build configuration
 ├── settings.gradle.kts                            # Project settings
 ├── gradle.properties                              # Gradle properties
+├── gradle/
+│   └── libs.versions.toml                         # Version catalog
 ├── gradlew                                        # Gradle wrapper script (Unix)
 ├── gradlew.bat                                    # Gradle wrapper script (Windows)
 └── README.md                                      # Project documentation
@@ -186,7 +211,29 @@ The app uses the PokeAPI for Pokemon data:
 - **Compile SDK**: 36
 - **Target SDK**: 35
 - **Minimum SDK**: 24
-- **Java Version**: 11
-- **Kotlin Version**: 2.0.21
+- **Java Version**: 17
+- **Kotlin Version**: 1.9.22
+- **Compose Compiler**: 1.5.8
+- **Gradle**: 8.11.1
+- **AGP**: 8.9.1
+
+## 🧪 Testing
+
+The project includes comprehensive testing:
+
+### Unit Tests
+- **ViewModel Tests**: Test business logic and state management
+- **Repository Tests**: Test data layer functionality
+- **Utility Tests**: Test helper functions
+- **Mockito Integration**: Mocking external dependencies
+- **Coroutine Testing**: Test async operations with `StandardTestDispatcher`
+
+### Test Structure
+```
+test/
+├── PokemonListViewModelTest.kt    # List ViewModel tests
+├── PokemonDetailsViewModelTest.kt # Details ViewModel tests
+└── UtilsTest.kt                   # Utility function tests
+```
 
 
