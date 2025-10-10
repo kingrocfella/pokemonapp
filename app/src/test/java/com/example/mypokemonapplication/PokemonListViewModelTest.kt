@@ -1,11 +1,11 @@
 package com.example.mypokemonapplication
 
-import com.example.mypokemonapplication.data.models.PokemonList
-import com.example.mypokemonapplication.data.models.PokemonListResult
 import com.example.mypokemonapplication.data.models.ViewModelState
 import com.example.mypokemonapplication.feature.pokemonlist.PokemonListViewModel
-import com.example.mypokemonapplication.data.api.ApiService
 import com.example.mypokemonapplication.data.repository.PokemonUrlRepository
+import com.example.mypokemonapplication.domain.entities.Pokemon
+import com.example.mypokemonapplication.domain.entities.PokemonListResult
+import com.example.mypokemonapplication.domain.usecase.GetPokemonListUseCase
 import com.example.mypokemonapplication.services.NavigationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,7 +28,7 @@ import kotlinx.coroutines.runBlocking
 class PokemonListViewModelTest {
 
     @Mock
-    private lateinit var mockApiService: ApiService
+    private lateinit var mockGetPokemonListUseCase: GetPokemonListUseCase
 
     private lateinit var pokemonUrlRepository: PokemonUrlRepository
 
@@ -54,13 +54,13 @@ class PokemonListViewModelTest {
     @Test
     fun `ViewModel should initialize with loading state`() {
         runBlocking {
-            whenever(mockApiService.getPokemonData(20, 0)).thenReturn(
-                PokemonList(0, null, null, emptyList())
+            whenever(mockGetPokemonListUseCase.invoke(20, 0)).thenReturn(
+                Result.success(PokemonListResult(0, null, null, emptyList()))
             )
         }
 
         viewModel = PokemonListViewModel(
-            mockApiService, pokemonUrlRepository,
+            mockGetPokemonListUseCase, pokemonUrlRepository,
             navigationService = navigationService
         )
 
@@ -74,23 +74,23 @@ class PokemonListViewModelTest {
     @Test
     fun `ViewModel should handle successful API response`() = runTest {
 
-        val mockPokemonList = PokemonList(
+        val mockPokemonList = PokemonListResult(
             count = 2,
             next = null,
             previous = null,
-            results = listOf(
-                PokemonListResult("bulbasaur", "https://pokeapi.co/api/v2/pokemon/1/"),
-                PokemonListResult("ivysaur", "https://pokeapi.co/api/v2/pokemon/2/")
+            pokemons = listOf(
+                Pokemon("bulbasaur", "https://pokeapi.co/api/v2/pokemon/1/"),
+                Pokemon("ivysaur", "https://pokeapi.co/api/v2/pokemon/2/")
             )
         )
 
         runBlocking {
-            whenever(mockApiService.getPokemonData(20, 0)).thenReturn(mockPokemonList)
+            whenever(mockGetPokemonListUseCase.invoke(20, 0)).thenReturn(Result.success(mockPokemonList))
         }
 
-        // Create ViewModel with mocked API service
+        // Create ViewModel with mocked use case
         viewModel =
-            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
+            PokemonListViewModel(mockGetPokemonListUseCase, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 
@@ -99,26 +99,26 @@ class PokemonListViewModelTest {
         assertFalse("Should not be in error state", state.isError)
         assertNotNull("Pokemon list should not be null", state.data)
         assertEquals("Should have correct count", 2, state.data?.count)
-        assertEquals("Should have 2 results", 2, state.data?.results?.size)
+        assertEquals("Should have 2 results", 2, state.data?.pokemons?.size)
     }
 
     @Test
     fun `ViewModel should handle empty Pokemon list`() = runTest {
 
-        val emptyPokemonList = PokemonList(
+        val emptyPokemonList = PokemonListResult(
             count = 0,
             next = null,
             previous = null,
-            results = emptyList()
+            pokemons = emptyList()
         )
 
         runBlocking {
-            whenever(mockApiService.getPokemonData(20, 0)).thenReturn(emptyPokemonList)
+            whenever(mockGetPokemonListUseCase.invoke(20, 0)).thenReturn(Result.success(emptyPokemonList))
         }
 
-        // Create ViewModel with mocked API service
+        // Create ViewModel with mocked use case
         viewModel =
-            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
+            PokemonListViewModel(mockGetPokemonListUseCase, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 
@@ -127,29 +127,29 @@ class PokemonListViewModelTest {
         assertFalse("Should not be in error state", state.isError)
         assertNotNull("Pokemon list should not be null", state.data)
         assertEquals("Should have 0 count", 0, state.data?.count)
-        assertTrue("Results should be empty", state.data?.results?.isEmpty() == true)
+        assertTrue("Results should be empty", state.data?.pokemons?.isEmpty() == true)
     }
 
     @Test
     fun `ViewModel should handle pagination with next URL`() = runTest {
 
-        val firstPageResponse = PokemonList(
+        val firstPageResponse = PokemonListResult(
             count = 4,
             next = "https://pokeapi.co/api/v2/pokemon?offset=20&limit=20",
             previous = null,
-            results = listOf(
-                PokemonListResult("bulbasaur", "https://pokeapi.co/api/v2/pokemon/1/"),
-                PokemonListResult("ivysaur", "https://pokeapi.co/api/v2/pokemon/2/")
+            pokemons = listOf(
+                Pokemon("bulbasaur", "https://pokeapi.co/api/v2/pokemon/1/"),
+                Pokemon("ivysaur", "https://pokeapi.co/api/v2/pokemon/2/")
             )
         )
 
         runBlocking {
-            whenever(mockApiService.getPokemonData(20, 0)).thenReturn(firstPageResponse)
+            whenever(mockGetPokemonListUseCase.invoke(20, 0)).thenReturn(Result.success(firstPageResponse))
         }
 
-        // Create ViewModel with mocked API service
+        // Create ViewModel with mocked use case
         viewModel =
-            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
+            PokemonListViewModel(mockGetPokemonListUseCase, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 
@@ -164,23 +164,23 @@ class PokemonListViewModelTest {
     @Test
     fun `ViewModel should handle pagination with previous URL`() = runTest {
 
-        val secondPageResponse = PokemonList(
+        val secondPageResponse = PokemonListResult(
             count = 4,
             next = null,
             previous = "https://pokeapi.co/api/v2/pokemon?offset=0&limit=20",
-            results = listOf(
-                PokemonListResult("venusaur", "https://pokeapi.co/api/v2/pokemon/3/"),
-                PokemonListResult("charmander", "https://pokeapi.co/api/v2/pokemon/4/")
+            pokemons = listOf(
+                Pokemon("venusaur", "https://pokeapi.co/api/v2/pokemon/3/"),
+                Pokemon("charmander", "https://pokeapi.co/api/v2/pokemon/4/")
             )
         )
 
         runBlocking {
-            whenever(mockApiService.getPokemonData(20, 0)).thenReturn(secondPageResponse)
+            whenever(mockGetPokemonListUseCase.invoke(20, 0)).thenReturn(Result.success(secondPageResponse))
         }
 
-        // Create ViewModel with mocked API service
+        // Create ViewModel with mocked use case
         viewModel =
-            PokemonListViewModel(mockApiService, pokemonUrlRepository, navigationService)
+            PokemonListViewModel(mockGetPokemonListUseCase, pokemonUrlRepository, navigationService)
 
         advanceUntilIdle()
 

@@ -29,10 +29,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.mypokemonapplication.common.utils.Utils
-import com.example.mypokemonapplication.data.models.PokemonDetails
+import com.example.mypokemonapplication.domain.entities.PokemonDetail
 
 @Composable
-fun DisplayPokemonDetails(pokemonDetails: PokemonDetails?) {
+fun DisplayPokemonDetails(pokemonDetails: PokemonDetail?) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,7 +89,7 @@ fun DisplayPokemonDetails(pokemonDetails: PokemonDetails?) {
                 ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(pokemonDetails?.sprites?.front_default)
+                            .data(pokemonDetails?.imageUrl)
                             .crossfade(true)
                             .build(),
                         contentDescription = "Pokemon image for ${pokemonDetails?.name}",

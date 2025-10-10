@@ -21,9 +21,7 @@ fun PokemonDetailsScreen() {
             isDataEmpty = state.data?.name?.isEmpty() == true
         ),
         {
-            if (state.data != null) {
-                DisplayPokemonDetails(state.data)
-            }
+            DisplayPokemonDetails(state.data)
         }
     )
 }

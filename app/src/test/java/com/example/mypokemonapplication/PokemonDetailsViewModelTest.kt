@@ -1,10 +1,9 @@
 package com.example.mypokemonapplication
 
-import com.example.mypokemonapplication.data.models.PokemonDetails
-import com.example.mypokemonapplication.data.models.PokemonSpriteDetails
+import com.example.mypokemonapplication.domain.entities.PokemonDetail
 import com.example.mypokemonapplication.feature.pokemondetails.PokemonDetailsViewModel
-import com.example.mypokemonapplication.data.api.ApiService
 import com.example.mypokemonapplication.data.repository.PokemonUrlRepository
+import com.example.mypokemonapplication.domain.usecase.GetPokemonDetailsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -26,7 +25,7 @@ import kotlinx.coroutines.runBlocking
 class PokemonDetailsViewModelTest {
 
     @Mock
-    private lateinit var mockApiService: ApiService
+    private lateinit var mockGetPokemonDetailsUseCase: GetPokemonDetailsUseCase
 
     private lateinit var pokemonUrlRepository: PokemonUrlRepository
 
@@ -49,12 +48,12 @@ class PokemonDetailsViewModelTest {
     fun `ViewModel should initialize with loading state`() {
 
         runBlocking {
-            whenever(mockApiService.getPokemonDetailsData(25)).thenReturn(
-                createMockPokemonDetails()
+            whenever(mockGetPokemonDetailsUseCase.invoke(25)).thenReturn(
+                Result.success(createMockPokemonDetails())
             )
         }
 
-        viewModel = PokemonDetailsViewModel(mockApiService, pokemonUrlRepository)
+        viewModel = PokemonDetailsViewModel(mockGetPokemonDetailsUseCase, pokemonUrlRepository)
         val initialState = viewModel.getPokemonDetailsState.value
 
         assertTrue("Should start in loading state", initialState.isLoading)
@@ -69,10 +68,10 @@ class PokemonDetailsViewModelTest {
         val mockPokemonDetails = createMockPokemonDetails()
 
         runBlocking {
-            whenever(mockApiService.getPokemonDetailsData(25)).thenReturn(mockPokemonDetails)
+            whenever(mockGetPokemonDetailsUseCase.invoke(25)).thenReturn(Result.success(mockPokemonDetails))
         }
 
-        viewModel = PokemonDetailsViewModel(mockApiService, pokemonUrlRepository)
+        viewModel = PokemonDetailsViewModel(mockGetPokemonDetailsUseCase, pokemonUrlRepository)
         pokemonUrlRepository.setSelectedPokemonUrl(testUrl)
         advanceUntilIdle()
 
@@ -90,7 +89,7 @@ class PokemonDetailsViewModelTest {
         val invalidUrl = "https://pokeapi.co/api/v2/pokemon/invalid/"
 
         val mockRepository = PokemonUrlRepository()
-        viewModel = PokemonDetailsViewModel(mockApiService, mockRepository)
+        viewModel = PokemonDetailsViewModel(mockGetPokemonDetailsUseCase, mockRepository)
         mockRepository.setSelectedPokemonUrl(invalidUrl)
         advanceUntilIdle()
 
@@ -107,7 +106,7 @@ class PokemonDetailsViewModelTest {
         val emptyUrl = ""
 
         val mockRepository = PokemonUrlRepository()
-        viewModel = PokemonDetailsViewModel(mockApiService, mockRepository)
+        viewModel = PokemonDetailsViewModel(mockGetPokemonDetailsUseCase, mockRepository)
         mockRepository.setSelectedPokemonUrl(emptyUrl)
         advanceUntilIdle()
 
@@ -118,18 +117,18 @@ class PokemonDetailsViewModelTest {
         assertNotNull("Error message should not be null", state.errorMessage)
     }
 
-    // Helper function to create mock PokemonDetails data class
+    // Helper function to create mock PokemonDetail domain entity
     private fun createMockPokemonDetails(
         id: Int = 25,
         name: String = "pikachu",
         height: Int = 4,
-        spriteUrl: String = "https://pokeapi.co/api/v2/pokemon/25/sprites/front_default.png"
-    ): PokemonDetails {
-        return PokemonDetails(
+        imageUrl: String = "https://pokeapi.co/api/v2/pokemon/25/sprites/front_default.png"
+    ): PokemonDetail {
+        return PokemonDetail(
             id = id,
             name = name,
             height = height,
-            sprites = PokemonSpriteDetails(front_default = spriteUrl)
+            imageUrl = imageUrl
         )
     }
 }

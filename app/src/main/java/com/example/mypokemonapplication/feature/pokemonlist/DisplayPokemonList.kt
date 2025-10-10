@@ -19,11 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mypokemonapplication.data.models.PokemonListResult
+import com.example.mypokemonapplication.domain.entities.Pokemon
 
 @Composable
 fun DisplayPokemonList(
-    pokemonData: List<PokemonListResult>,
+    pokemonData: List<Pokemon>,
     onNextClick: () -> Unit,
     onDetailsClick: (url: String) -> Unit,
     onPrevClick: () -> Unit

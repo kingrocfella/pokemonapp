@@ -21,10 +21,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mypokemonapplication.common.utils.Utils
-import com.example.mypokemonapplication.data.models.PokemonListResult
+import com.example.mypokemonapplication.domain.entities.Pokemon
 
 @Composable
-fun PokemonItem(item: PokemonListResult, onDetailsClick: (url: String) -> Unit) {
+fun PokemonItem(item: Pokemon, onDetailsClick: (url: String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

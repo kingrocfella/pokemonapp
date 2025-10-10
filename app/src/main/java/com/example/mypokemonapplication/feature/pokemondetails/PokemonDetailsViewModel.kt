@@ -2,11 +2,11 @@ package com.example.mypokemonapplication.feature.pokemondetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mypokemonapplication.data.api.ApiService
 import com.example.mypokemonapplication.common.utils.Utils
 import com.example.mypokemonapplication.data.repository.PokemonUrlRepository
-import com.example.mypokemonapplication.data.models.PokemonDetails
 import com.example.mypokemonapplication.data.models.ViewModelState
+import com.example.mypokemonapplication.domain.entities.PokemonDetail
+import com.example.mypokemonapplication.domain.usecase.GetPokemonDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,10 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PokemonDetailsViewModel @Inject constructor(
-    private val apiService: ApiService,
+    private val getPokemonDetailsUseCase: GetPokemonDetailsUseCase,
     pokemonUrlRepository: PokemonUrlRepository
 ) : ViewModel() {
-    private val _pokemonDetails = MutableStateFlow(ViewModelState<PokemonDetails>())
+    private val _pokemonDetails = MutableStateFlow(ViewModelState<PokemonDetail>())
     val getPokemonDetailsState = _pokemonDetails.asStateFlow()
 
     init {
@@ -34,22 +34,25 @@ class PokemonDetailsViewModel @Inject constructor(
 
     private fun fetchPokemonDetails(id: Int) {
         viewModelScope.launch {
-            try {
-                val response = apiService.getPokemonDetailsData(id)
-                _pokemonDetails.value = _pokemonDetails.value.copy(
-                    isLoading = false,
-                    isError = false,
-                    data = response,
-                    errorMessage = null
-                )
-            } catch (e: Exception) {
-                _pokemonDetails.value = _pokemonDetails.value.copy(
-                    isLoading = false,
-                    isError = true,
-                    data = null,
-                    errorMessage = e.message
-                )
-            }
+            _pokemonDetails.value = _pokemonDetails.value.copy(isLoading = true)
+            
+            getPokemonDetailsUseCase(id)
+                .onSuccess { pokemonDetail ->
+                    _pokemonDetails.value = _pokemonDetails.value.copy(
+                        isLoading = false,
+                        isError = false,
+                        data = pokemonDetail,
+                        errorMessage = null
+                    )
+                }
+                .onFailure { exception ->
+                    _pokemonDetails.value = _pokemonDetails.value.copy(
+                        isLoading = false,
+                        isError = true,
+                        data = null,
+                        errorMessage = exception.message
+                    )
+                }
         }
     }
 
